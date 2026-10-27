@@ -1,0 +1,10 @@
+{
+	"id": "obsidian-random-record",
+	"name": "Obsidian Random Record",
+	"version": "1.0.0",
+	"minAppVersion": "1.6.6",
+	"description": "Open a random record, add it to a log",
+	"author": "N Kort",
+	"authorUrl": "https://n-kort.net",
+	"isDesktopOnly": false
+}
