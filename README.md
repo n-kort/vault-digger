@@ -1,4 +1,6 @@
-# Obsidian Random Record
+# Vault Digger
+
+> Obsidian Plugin for opening (and logging) random notes from a folder
 
 Have you catalogued all your records (books, films) in your vault? Then pick a random one to listen/read/watch!
 
