@@ -6,12 +6,14 @@ export interface RandomRecordSettings {
 	folder: string;
 	logPath: string;
 	recentExclusionCount: number;
+	logItemFormat: string;
 }
 
 export const DEFAULT_SETTINGS: RandomRecordSettings = {
 	folder: '',
 	logPath: 'record log.md',
 	recentExclusionCount: 30,
+	logItemFormat: '{{link}}',
 };
 
 export class RandomRecordSettingTab extends PluginSettingTab {
@@ -51,6 +53,23 @@ export class RandomRecordSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.logPath =
 							value.trim() || DEFAULT_SETTINGS.logPath;
+						await this.plugin.saveSettings();
+					}),
+			);
+
+		new Setting(containerEl)
+			.setName('Log item format')
+			.setDesc(
+				'Use {{link}} for the note link and {{property}} for note properties. ' +
+					'{{artist|author}} uses the first property with a value.',
+			)
+			.addText((text) =>
+				text
+					.setPlaceholder(DEFAULT_SETTINGS.logItemFormat)
+					.setValue(this.plugin.settings.logItemFormat)
+					.onChange(async (value) => {
+						this.plugin.settings.logItemFormat =
+							value.trim() || DEFAULT_SETTINGS.logItemFormat;
 						await this.plugin.saveSettings();
 					}),
 			);

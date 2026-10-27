@@ -20,7 +20,7 @@ export async function openTodaysRecord(
 		return;
 	}
 
-	await log.add(today(), record);
+	await log.add(today(), record, settings.logItemFormat);
 	await openInTab(app, record);
 }
 

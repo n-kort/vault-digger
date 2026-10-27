@@ -1,7 +1,8 @@
 import { App, moment, normalizePath, TFile } from 'obsidian';
+import { formatLogItem } from './log-item-format';
 
 const HEADING_PATTERN = /^#{3,4}\s+(.+?)\s*$/;
-const WIKILINK_PATTERN = /\[\[([^\]|#]+)(?:[#|][^\]]*)?\]\]/;
+const WIKILINK_PATTERN = /\[\[([^\]|#]+)(?:[#|][^\]]*)?\]\]/g;
 
 interface LogEntry {
 	date: string;
@@ -36,9 +37,11 @@ export class RecordLog {
 				currentDate = heading[1];
 				continue;
 			}
-			const link = WIKILINK_PATTERN.exec(line);
-			if (currentDate && link?.[1]) {
-				entries.push({ date: currentDate, linktext: link[1].trim() });
+			if (!currentDate) continue;
+			for (const link of line.matchAll(WIKILINK_PATTERN)) {
+				if (link[1]) {
+					entries.push({ date: currentDate, linktext: link[1].trim() });
+				}
 			}
 		}
 
@@ -52,13 +55,14 @@ export class RecordLog {
 		);
 	}
 
-	async add(date: string, record: TFile): Promise<void> {
-		const linktext = this.app.metadataCache.fileToLinktext(
+	async add(date: string, record: TFile, itemFormat: string): Promise<void> {
+		const formatted = formatLogItem(
+			this.app,
 			record,
 			this.normalizedPath,
-			true,
+			itemFormat,
 		);
-		const item = `- [ ] [[${linktext}]]`;
+		const item = `- [ ] ${formatted}`;
 		const section = `#### ${date}\n${item}\n\n`;
 
 		const file = this.getFile();
