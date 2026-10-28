@@ -19,7 +19,7 @@ export class RecordLog {
 		return normalizePath(this.path);
 	}
 
-	private getFile(): TFile | null {
+	getFile(): TFile | null {
 		return this.app.vault.getFileByPath(this.normalizedPath);
 	}
 
@@ -55,14 +55,19 @@ export class RecordLog {
 		);
 	}
 
-	async add(date: string, record: TFile, itemFormat: string): Promise<void> {
+	async add(
+		date: string,
+		record: TFile,
+		itemFormat: string,
+		suffix = '',
+	): Promise<void> {
 		const formatted = formatLogItem(
 			this.app,
 			record,
 			this.normalizedPath,
 			itemFormat,
 		);
-		const item = `- [ ] ${formatted}`;
+		const item = `- [ ] ${formatted}${suffix}`;
 		const section = `#### ${date}\n${item}\n\n`;
 
 		const file = this.getFile();

@@ -7,6 +7,9 @@ export interface RandomRecordSettings {
 	logPath: string;
 	recentExclusionCount: number;
 	logItemFormat: string;
+	openRecord: boolean;
+	appendWikipediaLink: boolean;
+	wikipediaSearchTerms: string;
 }
 
 export const DEFAULT_SETTINGS: RandomRecordSettings = {
@@ -14,6 +17,9 @@ export const DEFAULT_SETTINGS: RandomRecordSettings = {
 	logPath: 'record log.md',
 	recentExclusionCount: 30,
 	logItemFormat: '{{link}}',
+	openRecord: true,
+	appendWikipediaLink: false,
+	wikipediaSearchTerms: '{{artist|author}}',
 };
 
 export class RandomRecordSettingTab extends PluginSettingTab {
@@ -70,6 +76,51 @@ export class RandomRecordSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.logItemFormat =
 							value.trim() || DEFAULT_SETTINGS.logItemFormat;
+						await this.plugin.saveSettings();
+					}),
+			);
+
+		new Setting(containerEl)
+			.setName('Open picked note')
+			.setDesc('Open the picked note. When off, the log file is opened instead.')
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.openRecord)
+					.onChange(async (value) => {
+						this.plugin.settings.openRecord = value;
+						await this.plugin.saveSettings();
+					}),
+			);
+
+		new Setting(containerEl)
+			.setName('Append Wikipedia link')
+			.setDesc(
+				'Search Wikipedia and add the top result to the log entry. ' +
+					'Sends the search text to wikipedia.org.',
+			)
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.appendWikipediaLink)
+					.onChange(async (value) => {
+						this.plugin.settings.appendWikipediaLink = value;
+						await this.plugin.saveSettings();
+					}),
+			);
+
+		new Setting(containerEl)
+			.setName('Wikipedia search terms')
+			.setDesc(
+				'Words the article must contain, such as the artist. ' +
+					'Use {{property}} for note properties. ' +
+					'The article title must match the note title, or no link is added.',
+			)
+			.addText((text) =>
+				text
+					.setPlaceholder(DEFAULT_SETTINGS.wikipediaSearchTerms)
+					.setValue(this.plugin.settings.wikipediaSearchTerms)
+					.onChange(async (value) => {
+						this.plugin.settings.wikipediaSearchTerms =
+							value.trim() || DEFAULT_SETTINGS.wikipediaSearchTerms;
 						await this.plugin.saveSettings();
 					}),
 			);

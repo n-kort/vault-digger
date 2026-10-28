@@ -9,7 +9,23 @@ export function formatLogItem(
 	format: string,
 ): string {
 	const linktext = app.metadataCache.fileToLinktext(record, sourcePath, true);
-	const link = `[[${linktext}]]`;
+	return formatTemplate(app, record, format, `[[${linktext}]]`);
+}
+
+export function formatSearchQuery(
+	app: App,
+	record: TFile,
+	format: string,
+): string {
+	return formatTemplate(app, record, format, record.basename);
+}
+
+function formatTemplate(
+	app: App,
+	record: TFile,
+	format: string,
+	link: string,
+): string {
 	const frontmatter = app.metadataCache.getFileCache(record)?.frontmatter ?? {};
 
 	return format
@@ -17,6 +33,7 @@ export function formatLogItem(
 			const keys = expression.split('|').map((key) => key.trim());
 			for (const key of keys) {
 				if (key === 'link') return link;
+				if (key === 'title') return record.basename;
 				const value = stringifyProperty(frontmatter[key]);
 				if (value) return value;
 			}

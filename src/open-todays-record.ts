@@ -1,6 +1,8 @@
 import { App, MarkdownView, Notice, normalizePath, TFile } from 'obsidian';
+import { formatSearchQuery } from './log-item-format';
 import { RecordLog, today } from './record-log';
 import type { RandomRecordSettings } from './settings';
+import { findWikipediaUrl } from './wikipedia';
 
 export async function openTodaysRecord(
 	app: App,
@@ -20,8 +22,17 @@ export async function openTodaysRecord(
 		return;
 	}
 
-	await log.add(today(), record, settings.logItemFormat);
-	await openInTab(app, record);
+	const wikipediaUrl = settings.appendWikipediaLink
+		? await findWikipediaUrl(
+				record.basename,
+				formatSearchQuery(app, record, settings.wikipediaSearchTerms),
+			)
+		: null;
+	const suffix = wikipediaUrl ? ` [Wikipedia](${wikipediaUrl})` : '';
+	await log.add(today(), record, settings.logItemFormat, suffix);
+
+	const fileToOpen = settings.openRecord ? record : log.getFile();
+	if (fileToOpen) await openInTab(app, fileToOpen);
 }
 
 function pickRandomRecord(
